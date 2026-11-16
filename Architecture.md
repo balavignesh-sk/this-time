@@ -55,3 +55,43 @@ Physical-device validation is still required for Family Controls authorization, 
 website token behavior, notification-to-app handoff, and background threshold/warning delivery.
 The project currently has Family Controls development entitlements; distribution entitlement
 approval remains a separate signing requirement.
+
+## Live Activities
+
+IntentionLiveActivityExtension renders the intention on the Lock Screen and in the
+Dynamic Island. IntentionActivityAttributes is shared with the app and the Screen
+Time targets. The app starts an activity only after a grant has been committed;
+disabled or unavailable Live Activities do not prevent an otherwise valid unlock.
+
+App/category monitoring registers cumulative one-minute progress thresholds alongside
+the final enforcement threshold. The monitor records the highest confirmed usage
+minute under the existing shared file lock. Duplicate, late, and out-of-order callbacks
+cannot reset progress or affect a replacement session. SessionActivityPublisher reads
+committed storage to update or end existing activities after grants change, including
+manual relock, removal, protection being disabled, and expiry.
+
+The displayed usage value is an upper bound on remaining minutes, not a wall-clock
+countdown. The collapsed and minimal Dynamic Island presentations emphasize a timer
+ring showing the remaining fraction; the expanded view pairs it with the intention
+and a plain-text “this app” reference. FamilyControls token labels cannot render in
+this Live Activity, so the widget avoids those remote views. Each report carries its receipt time. After
+90 seconds without a report, the existing usage ring and last confirmed remaining value fade lightly to 65%
+opacity, retaining the timer icon and the last known progress. Accessibility identifies it as last confirmed.
+Returning to the app does not refresh that timestamp or reset usage. Website rings
+count down to the stored elapsed-time deadline and stay empty at zero until the
+session is removed. Website grants replace earlier website grants because all
+selected websites share access. Token data is optional for older activities, and
+oversized payloads fall back to “your selection” to stay within ActivityKit's limit.
+
+Screen Time callbacks and extension execution are system-scheduled, so this does not
+promise exact second-by-second usage or immediate background ActivityKit delivery.
+ActivityKit also imposes its own lifetime limit (up to eight active hours), independently
+of the 24-hour usage monitoring window. The monitor still enforces limits if an
+activity is dismissed, unavailable, or has ended.
+
+Validation: Xcode build and executable checks cover budget calculations, stale deadlines,
+clamping, duplicate/out-of-order progress, invalid thresholds, and legacy session decoding.
+Physical-device checks still needed: background progress delivery, force-quit behavior,
+early relock, website expiry, multiple grants, disabled Live Activities, and long budgets
+with many threshold events. See Apple's [Live Activities documentation](https://developer.apple.com/documentation/activitykit/displaying-live-data-with-live-activities)
+for lifecycle and payload limits.

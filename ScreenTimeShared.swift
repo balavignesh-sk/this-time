@@ -4,6 +4,8 @@ import Darwin
 import ManagedSettings
 import DeviceActivity
 import UserNotifications
+import ActivityKit
+import OSLog
 
 /// Atomic cross-process intention requests, active grants, and shield reconciliation.
 nonisolated enum ScreenTimeShared {
@@ -13,6 +15,7 @@ nonisolated enum ScreenTimeShared {
     static let idlePrefix = "thisTime.idle."
     static let schedulePrefix = "thisTime.schedule."
     static let usageEventName = "usageLimit"
+    static let usageProgressPrefix = "usageProgress."
 
     struct Item: Codable {
         let id: String
@@ -36,6 +39,15 @@ nonisolated enum ScreenTimeShared {
         var minutes: Int? = nil
         var lastActivity: Date? = nil
         var midpointSent: Bool? = nil
+        var startedAt: Date? = nil
+        var confirmedUsedMinutes: Int? = nil
+        var usageReportedAt: Date? = nil
+
+        mutating func recordUsage(minutes used: Int, at date: Date) {
+            guard let minutes, used > (confirmedUsedMinutes ?? 0), used < minutes else { return }
+            confirmedUsedMinutes = used
+            usageReportedAt = date
+        }
     }
 
     struct State: Codable {
@@ -76,6 +88,8 @@ nonisolated enum ScreenTimeShared {
             let data = try JSONEncoder().encode(state)
             try apply(state)
             try data.write(to: directory.appendingPathComponent("screen-time.json"), options: .atomic)
+            // Publish only committed state. The publisher reads again after the lock is released.
+            Task { await SessionActivityPublisher.shared.synchronize() }
             return result
         } catch {
             try? apply(original)
@@ -157,5 +171,93 @@ nonisolated enum ScreenTimeShared {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["midpoint." + id.uuidString])
     }
 
+}
+
+/// Serializes ActivityKit work within each process. Shared storage remains the authority.
+actor SessionActivityPublisher {
+    static let shared = SessionActivityPublisher()
+    private var publishing = false
+    private var needsPublish = false
+
+    func synchronize() async {
+        needsPublish = true
+        guard !publishing else { return }
+        publishing = true
+        defer { publishing = false }
+
+        while needsPublish {
+            needsPublish = false
+            for activity in Activity<IntentionActivityAttributes>.activities {
+                // Re-read for each activity; never publish a captured, obsolete callback payload.
+                guard let state = try? ScreenTimeShared.snapshot() else { continue }
+                guard state.enabled,
+                      let session = state.sessions.first(where: { $0.id == activity.attributes.sessionID }),
+                      session.end > Date() else {
+                    var ended = activity.content.state
+                    ended.ended = true
+                    await activity.end(ActivityContent(state: ended, staleDate: nil), dismissalPolicy: .immediate)
+                    continue
+                }
+                let content = IntentionActivityAttributes.ContentState(
+                    confirmedUsedMinutes: session.confirmedUsedMinutes ?? 0,
+                    reportedAt: session.usageReportedAt ?? session.startedAt ?? activity.attributes.startedAt
+                )
+                guard content != activity.content.state else { continue }
+                // A late callback cannot roll back a more recent usage report.
+                guard content.confirmedUsedMinutes >= activity.content.state.confirmedUsedMinutes else { continue }
+                await activity.update(ActivityContent(
+                    state: content, staleDate: activity.attributes.staleDate(for: content)
+                ))
+            }
+        }
+    }
+
+    #if FAMILY_CONTROLS
+    /// Called synchronously during the foreground unlock action, after monitoring is registered.
+    nonisolated static func start(sessionID: UUID, isWebsite: Bool) {
+        guard ActivityAuthorizationInfo().areActivitiesEnabled,
+              let state = try? ScreenTimeShared.snapshot(), state.enabled,
+              let session = state.sessions.first(where: { $0.id == sessionID }),
+              let startedAt = session.startedAt, let minutes = session.minutes,
+              session.end > Date(),
+              !Activity<IntentionActivityAttributes>.activities.contains(where: { $0.attributes.sessionID == sessionID })
+        else { return }
+        // ActivityKit has a 4 KB payload limit. Keep a bounded UTF-8 excerpt of long answers.
+        var intention = String(decoding: Array((session.reason ?? "").utf8.prefix(1200)), as: UTF8.self)
+        // JSON can expand control characters to six bytes; bound the encoded text too.
+        while (try? JSONEncoder().encode(intention).count) ?? Int.max > 1800, !intention.isEmpty {
+            intention.removeLast()
+        }
+        let item = state.items.first { $0.id == session.itemID }
+        var attributes = IntentionActivityAttributes(
+            sessionID: session.id, intention: intention, minutes: minutes,
+            timing: isWebsite ? .elapsed : .usage, startedAt: startedAt, deadline: session.end,
+            applicationTokenData: item?.application, webDomainTokenData: item?.website,
+            categoryTokenData: item?.category
+        )
+        // Leave room for dynamic content within ActivityKit's 4 KB limit.
+        if (try? JSONEncoder().encode(attributes).count) ?? Int.max > 3500 {
+            attributes.applicationTokenData = nil
+            attributes.webDomainTokenData = nil
+            attributes.categoryTokenData = nil
+        }
+        let content = IntentionActivityAttributes.ContentState(
+            confirmedUsedMinutes: session.confirmedUsedMinutes ?? 0,
+            reportedAt: session.usageReportedAt ?? startedAt
+        )
+        do {
+            _ = try Activity.request(
+                attributes: attributes,
+                content: ActivityContent(state: content, staleDate: attributes.staleDate(for: content)),
+                pushType: nil
+            )
+            Task { await shared.synchronize() }
+        } catch {
+            // Live Activities are optional; their availability must not change enforcement.
+            Logger(subsystem: "com.vigneshcorp.thistime", category: "LiveActivity")
+                .error("Could not start Live Activity: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+    #endif
 }
 #endif

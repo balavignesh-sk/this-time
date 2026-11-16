@@ -104,6 +104,13 @@ final class AppBlocking: BlockingClient {
         let name = DeviceActivityName(ScreenTimeShared.activityPrefix + sessionID.uuidString)
         var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
         if !isWebsite {
+            // All thresholds share the original monitoring start; reopening the app never resets usage.
+            for minute in 1..<minutes {
+                events[.init(ScreenTimeShared.usageProgressPrefix + String(minute))] = DeviceActivityEvent(
+                    applications: Set(apps), categories: Set(categories),
+                    threshold: DateComponents(minute: minute), includesPastActivity: false
+                )
+            }
             events[.init(ScreenTimeShared.usageEventName)] = DeviceActivityEvent(
                 applications: Set(apps), categories: Set(categories),
                 threshold: DateComponents(minute: minutes), includesPastActivity: false
@@ -118,12 +125,18 @@ final class AppBlocking: BlockingClient {
                       state.items.contains(where: { $0.id == service.id }) else {
                     throw BlockingError.missingRequest
                 }
-                state.sessions.removeAll { $0.itemID == service.id }
+                // Websites share one grant, so their Live Activity must describe that same grant.
+                let websiteIDs = Set(state.items.filter { $0.website != nil }.map(\.id))
+                state.sessions.removeAll {
+                    $0.itemID == service.id || (isWebsite && websiteIDs.contains($0.itemID))
+                }
                 state.sessions.append(.init(id: sessionID, itemID: service.id, end: end,
-                                            reason: reason, minutes: minutes))
+                                            reason: reason, minutes: minutes, startedAt: now,
+                                            confirmedUsedMinutes: 0, usageReportedAt: now))
                 state.request = nil
             }
             cleanupSessions()
+            SessionActivityPublisher.start(sessionID: sessionID, isWebsite: isWebsite)
         } catch {
             ScreenTimeShared.stopSession(sessionID)
             throw error
