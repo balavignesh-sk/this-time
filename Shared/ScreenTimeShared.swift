@@ -3,7 +3,6 @@ import Foundation
 import Darwin
 import ManagedSettings
 import DeviceActivity
-import UserNotifications
 import ActivityKit
 import OSLog
 
@@ -12,8 +11,6 @@ nonisolated enum ScreenTimeShared {
     static let groupID = "group.com.vigneshcorp.thistime"
     static let storeName = ManagedSettingsStore.Name("thisTime.blocking")
     static let activityPrefix = "thisTime.session."
-    static let idlePrefix = "thisTime.idle."
-    static let schedulePrefix = "thisTime.schedule."
     static let usageEventName = "usageLimit"
     static let usageProgressPrefix = "usageProgress."
 
@@ -28,7 +25,6 @@ nonisolated enum ScreenTimeShared {
         var id = UUID()
         let itemID: String
         var created = Date()
-        var isSnooze: Bool? = nil
     }
 
     struct Session: Codable {
@@ -37,8 +33,6 @@ nonisolated enum ScreenTimeShared {
         let end: Date
         var reason: String? = nil
         var minutes: Int? = nil
-        var lastActivity: Date? = nil
-        var midpointSent: Bool? = nil
         var startedAt: Date? = nil
         var confirmedUsedMinutes: Int? = nil
         var usageReportedAt: Date? = nil
@@ -51,14 +45,13 @@ nonisolated enum ScreenTimeShared {
     }
 
     struct State: Codable {
-        var usageTimingVersion: Int? = nil
         var enabled = false
         var items: [Item] = []
         var sessions: [Session] = []
         var request: Request?
     }
 
-    enum StorageError: Error { case unavailable, lockFailed, invalidSelection, scheduledBlock }
+    enum StorageError: Error { case unavailable, lockFailed, invalidSelection }
 
     static func snapshot() throws -> State {
         guard let directory = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID) else {
@@ -81,7 +74,7 @@ nonisolated enum ScreenTimeShared {
         defer { flock(descriptor, LOCK_UN) }
         var state = try snapshot()
         reconcile(&state, at: Date())
-        // Roll back to reconciled shields; migration may have stopped old monitors.
+        // Restore reconciled shields if committing the update fails.
         let original = state
         let result = try operation(&state)
         do {
@@ -98,15 +91,6 @@ nonisolated enum ScreenTimeShared {
     }
 
     static func reconcile(_ state: inout State, at now: Date) {
-        // Version 2 removes legacy cooldowns, schedules, and inactivity monitors.
-        if state.usageTimingVersion != 2 {
-            for session in state.sessions { stopSession(session.id) }
-            let oldSchedules = DeviceActivityCenter().activities.filter { $0.rawValue.hasPrefix(schedulePrefix) }
-            DeviceActivityCenter().stopMonitoring(oldSchedules)
-            state.sessions = []
-            state.request = nil
-            state.usageTimingVersion = 2
-        }
         let expired = state.sessions.filter { $0.end <= now }
         state.sessions.removeAll { $0.end <= now }
         for session in expired { stopSession(session.id) }
@@ -159,16 +143,14 @@ nonisolated enum ScreenTimeShared {
             guard state.enabled, let id = selectedID else {
                 throw StorageError.invalidSelection
             }
-            state.request = Request(itemID: id, isSnooze: false)
+            state.request = Request(itemID: id)
         }
     }
 
     static func stopSession(_ id: UUID) {
         DeviceActivityCenter().stopMonitoring([
-            DeviceActivityName(activityPrefix + id.uuidString),
-            DeviceActivityName(idlePrefix + id.uuidString)
+            DeviceActivityName(activityPrefix + id.uuidString)
         ])
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["midpoint." + id.uuidString])
     }
 
 }

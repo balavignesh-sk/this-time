@@ -27,8 +27,8 @@ final class IntentionShieldAction: ShieldActionDelegate {
             content.title = String(localized: "Why do you want to use it?")
             content.body = String(localized: "Tap to answer, then decide whether to open it.")
             content.sound = .default
-            content.userInfo = ["route": "reflection"]
-            let request = UNNotificationRequest(identifier: "thisTime.reflection", content: content,
+            content.userInfo = ["route": "setAppOpenIntention"]
+            let request = UNNotificationRequest(identifier: "thisTime.setAppOpenIntention", content: content,
                                                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false))
             // Keep the shield visible while iOS presents the notification.
             UNUserNotificationCenter.current().add(request) { _ in completionHandler(.none) }

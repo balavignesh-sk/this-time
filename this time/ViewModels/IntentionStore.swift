@@ -45,12 +45,6 @@ final class IntentionStore {
 
     func requestNotifications() async { await notifications.requestAuthorization() }
 
-    func setUnlockMinutes(_ minutes: Int) {
-        guard [5, 15, 30].contains(minutes) else { return }
-        intention.unlockMinutes = minutes
-        preferences.intentionPreferences = intention
-    }
-
     func addAlternative(_ text: String) {
         let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
@@ -112,13 +106,15 @@ final class IntentionStore {
     }
 
     func disableBlocking() {
-        blocking.clear()
-        blockingEnabled = false
-        protectionNeedsAuthorization = false
-        preferences.blockingEnabled = false
-        activeSessions = [:]
-        pendingPresentation = nil
-        unlockedService = nil
+        do {
+            try blocking.clear()
+            blockingEnabled = false
+            protectionNeedsAuthorization = false
+            preferences.blockingEnabled = false
+            activeSessions = [:]
+            pendingPresentation = nil
+            unlockedService = nil
+        } catch { notice = error.localizedDescription }
     }
 
     func refreshBlocking() {
@@ -180,7 +176,7 @@ final class IntentionStore {
             return false
         }
         let answer = answer.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard answer.count >= 10, let request = pendingPresentation, request.id == requestID else { return false }
+        guard SessionPolicy.isValidAnswer(answer), let request = pendingPresentation, request.id == requestID else { return false }
         let id = UUID()
         do {
             // Revalidate the cross-process request before acting on a presented prompt.
@@ -191,11 +187,11 @@ final class IntentionStore {
             }
             if unlock {
                 try blocking.beginSession(service: request.service, requestID: request.id, sessionID: id,
-                                          minutes: minutes, reason: answer, isSnooze: false)
+                                          minutes: minutes, reason: answer)
             }
             let entry = SessionHistoryEntry(id: id, service: request.service, intention: answer,
                                             startedAt: Date(), minutes: minutes,
-                                            isSnooze: false, prompt: request.prompt.text, didUnlock: unlock)
+                                            prompt: request.prompt.text, didUnlock: unlock)
             let updated = [entry] + history
             do {
                 try preferences.saveHistory(updated)

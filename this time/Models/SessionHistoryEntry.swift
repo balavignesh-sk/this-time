@@ -7,10 +7,6 @@ struct SessionHistoryEntry: Codable, Identifiable {
     let intention: String
     let startedAt: Date
     let minutes: Int
-    let isSnooze: Bool
-    var prompt: String? = nil
-    var didUnlock: Bool? = nil
-
-    // Older history only recorded successful unlocks.
-    var unlocked: Bool { didUnlock ?? true }
+    let prompt: String
+    let didUnlock: Bool
 }

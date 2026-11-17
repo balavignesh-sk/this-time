@@ -17,7 +17,7 @@ struct IntentionFlow: View {
     }
 
     private var validAnswer: Bool {
-        answer.trimmingCharacters(in: .whitespacesAndNewlines).count >= 10
+        SessionPolicy.isValidAnswer(answer)
     }
 
     var body: some View {
@@ -57,7 +57,7 @@ struct IntentionFlow: View {
                             .lineLimit(3...8)
                             .padding(.vertical, 16)
                             .overlay(alignment: .bottom) { Divider() }
-                        Text("Write at least 10 characters.")
+                        Text("Write at least \(SessionPolicy.minimumAnswerLength) characters.")
                             .font(.caption).foregroundStyle(Paper.muted)
                         Button("Continue") { confirming = true }
                             .buttonStyle(InkButton()).disabled(!validAnswer)

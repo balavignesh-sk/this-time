@@ -39,13 +39,12 @@ final class AppBlocking: BlockingClient {
         cleanupSessions()
     }
 
-    func clear() {
-        try? ScreenTimeShared.update { state in
+    func clear() throws {
+        try ScreenTimeShared.update { state in
             state.enabled = false
             state.sessions = []
             state.request = nil
         }
-        ManagedSettingsStore(named: ScreenTimeShared.storeName).clearAllSettings()
         cleanupSessions()
     }
 
@@ -69,7 +68,7 @@ final class AppBlocking: BlockingClient {
             guard state.enabled, state.items.contains(where: { $0.id == service.id }) else {
                 throw BlockingError.missingRequest
             }
-            state.request = .init(itemID: service.id, isSnooze: false)
+            state.request = .init(itemID: service.id)
         }
     }
 
@@ -86,9 +85,9 @@ final class AppBlocking: BlockingClient {
         }
     }
 
-    func beginSession(service: Service, requestID: UUID, sessionID: UUID, minutes: Int, reason: String, isSnooze: Bool) throws {
+    func beginSession(service: Service, requestID: UUID, sessionID: UUID, minutes: Int, reason: String) throws {
         guard isAuthorized else { throw BlockingError.notAuthorized }
-        guard SessionPolicy.allowedMinutes.contains(minutes), reason.trimmingCharacters(in: .whitespacesAndNewlines).count >= 10 else {
+        guard SessionPolicy.allowedMinutes.contains(minutes), SessionPolicy.isValidAnswer(reason) else {
             throw BlockingError.invalidLimit
         }
         let decoder = JSONDecoder()
@@ -170,7 +169,7 @@ final class AppBlocking: BlockingClient {
             switch self {
             case .notAuthorized: String(localized: "Allow Screen Time access to protect your selected items.")
             case .missingRequest: String(localized: "This request has expired. Choose the item again in Rules.")
-            case .invalidLimit: String(localized: "Write at least 10 characters and choose between 1 and 240 minutes.")
+            case .invalidLimit: String(localized: "Write at least \(SessionPolicy.minimumAnswerLength) characters and choose between \(SessionPolicy.minimumMinutes) and \(SessionPolicy.maximumMinutes) minutes.")
             }
         }
     }

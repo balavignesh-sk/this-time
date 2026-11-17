@@ -34,7 +34,7 @@ private struct IntentionEntryRow: View {
             HStack {
                 Text(entry.startedAt, format: .dateTime.month().day().hour().minute())
                 Spacer()
-                if entry.unlocked {
+                if entry.didUnlock {
                     Text("\(entry.minutes) min")
                 } else {
                     Text("Left locked")

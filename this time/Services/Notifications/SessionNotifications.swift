@@ -14,7 +14,7 @@ struct LocalSessionNotifications: SessionNotifications {
 
 final class IntentionNotificationDelegate: NSObject, UNUserNotificationCenterDelegate, Sendable {
     static let shared = IntentionNotificationDelegate()
-    static let opened = Notification.Name("thisTime.reflectionOpened")
+    static let opened = Notification.Name("thisTime.setAppOpenIntention.opened")
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
@@ -25,7 +25,7 @@ final class IntentionNotificationDelegate: NSObject, UNUserNotificationCenterDel
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        if response.notification.request.content.userInfo["route"] as? String == "reflection" {
+        if response.notification.request.content.userInfo["route"] as? String == "setAppOpenIntention" {
             NotificationCenter.default.post(name: Self.opened, object: nil)
         }
         completionHandler()

@@ -3,8 +3,9 @@
 ## Product flow
 
 - Onboarding explains the intention loop, requests Screen Time, and offers optional notifications.
-- Rules manages selected apps, categories, websites, a custom unlock duration,
-  and editable alternative activities.
+- Rules manages selected apps, categories, and websites. Settings manages alternative activities.
+- Each unlock confirmation offers a duration from 1–240 minutes, initially set to 15 minutes.
+  Duration is selected per request and is not saved as a preference.
 - A shield's secondary button stores a request in the App Group and sends a local notification.
   Users can also initiate the same request from Rules without notification permission.
 - A prompt asks for at least ten trimmed characters, optionally referring to a recent answer or
@@ -36,18 +37,19 @@ usage threshold, interval warning, or interval end and reapplies the current sel
 
 ## Persistence and migration
 
-Existing service/history keys are retained. Category tokens, stored prompts, and decision
-outcomes are additive optional fields. Historical records without an outcome mean unlocked.
-Intention preferences use thisTime.intention.v1. Existing selections and answers survive.
-Shared timing version 2 ends old grants and stops old schedules/idle monitors; legacy
-cooldowns and schedules no longer govern access. The old timing-policy source is archival.
+Service/history storage keys are retained, but history now requires a stored prompt and
+an explicit decision outcome. History arrays containing older records without these fields
+are not loaded. Intention preferences use thisTime.setAppOpenIntention.v1.
+Legacy snooze, cooldown, inactivity, and schedule fields and migration code have been removed.
+Upgrades from the legacy timing implementation are unsupported; use a fresh installation.
+Current grants continue to use usage thresholds or website elapsed-time deadlines.
 
 There are no external dependencies, analytics, accounts, or backend. Implementation uses
 Apple frameworks and the existing application identifiers and App Group.
 
 ## Validation
 
-Xcode builds and injected behavior checks cover compilation, legacy decoding, reason length,
+Xcode builds and injected behavior checks cover compilation, reason length,
 failed registration, success/duplicate decisions, stale requests, step-away history, manual
 relock, alternatives, duration validation, and history deletion.
 
@@ -90,7 +92,7 @@ of the 24-hour usage monitoring window. The monitor still enforces limits if an
 activity is dismissed, unavailable, or has ended.
 
 Validation: Xcode build and executable checks cover budget calculations, stale deadlines,
-clamping, duplicate/out-of-order progress, invalid thresholds, and legacy session decoding.
+clamping, duplicate/out-of-order progress, invalid thresholds, and session decoding.
 Physical-device checks still needed: background progress delivery, force-quit behavior,
 early relock, website expiry, multiple grants, disabled Live Activities, and long budgets
 with many threshold events. See Apple's [Live Activities documentation](https://developer.apple.com/documentation/activitykit/displaying-live-data-with-live-activities)

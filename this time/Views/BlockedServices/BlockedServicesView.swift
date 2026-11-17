@@ -70,26 +70,6 @@ private struct RulesFilterPill: View {
     }
 }
 
-struct UnlockDurationSection: View {
-    let store: IntentionStore
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Eyebrow(title: "UNLOCK DURATION")
-            Picker("Unlock duration", selection: Binding(
-                get: { store.intention.unlockMinutes }, set: { store.setUnlockMinutes($0) }
-            )) {
-                Text("5 min").tag(5)
-                Text("15 min").tag(15)
-                Text("30 min").tag(30)
-            }
-            .pickerStyle(.segmented)
-            Text("Apps and categories count active use. Websites unlock together for elapsed time. You can lock them again early.")
-                .font(.footnote).foregroundStyle(Paper.muted)
-        }
-    }
-}
-
 struct AlternativesSection: View {
     let store: IntentionStore
     @State private var newActivity = ""

@@ -8,7 +8,6 @@ protocol AppPreferences: AnyObject {
     func loadServices() -> [Service]
     func saveServices(_ services: [Service]) throws
     var blockingEnabled: Bool { get set }
-    var lastReasons: [String: String] { get set }
     var intentionPreferences: IntentionPreferences { get set }
 }
 
@@ -42,11 +41,11 @@ final class UserDefaultsAppPreferences: AppPreferences {
 
     var intentionPreferences: IntentionPreferences {
         get {
-            guard let data = defaults.data(forKey: "thisTime.reflection.v1"),
+            guard let data = defaults.data(forKey: "thisTime.setAppOpenIntention.v1"),
                   let value = try? JSONDecoder().decode(IntentionPreferences.self, from: data) else { return .init() }
             return value
         }
-        set { if let data = try? JSONEncoder().encode(newValue) { defaults.set(data, forKey: "thisTime.reflection.v1") } }
+        set { if let data = try? JSONEncoder().encode(newValue) { defaults.set(data, forKey: "thisTime.setAppOpenIntention.v1") } }
     }
 
     var blockingEnabled: Bool {
@@ -54,9 +53,5 @@ final class UserDefaultsAppPreferences: AppPreferences {
         set { defaults.set(newValue, forKey: "thisTime.blockingEnabled.v1") }
     }
 
-    var lastReasons: [String: String] {
-        get { defaults.dictionary(forKey: "thisTime.lastReasons") as? [String: String] ?? [:] }
-        set { defaults.set(newValue, forKey: "thisTime.lastReasons") }
-    }
 
 }

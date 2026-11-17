@@ -3,7 +3,6 @@ import Foundation
 struct BlockingRequest {
     let id: UUID
     let itemID: String
-    var isSnooze = false
 }
 
 @MainActor
@@ -12,12 +11,12 @@ protocol BlockingClient {
     var isAuthorized: Bool { get }
     func authorize() async throws
     func apply(services: [Service], enabled: Bool) throws
-    func clear()
+    func clear() throws
     func requestUnlock(for service: Service) throws
     func activeSessions() throws -> [String: UUID]
     func pendingRequest() throws -> BlockingRequest?
     func cancelRequest(_ id: UUID?)
-    func beginSession(service: Service, requestID: UUID, sessionID: UUID, minutes: Int, reason: String, isSnooze: Bool) throws
+    func beginSession(service: Service, requestID: UUID, sessionID: UUID, minutes: Int, reason: String) throws
     func endSession(_ id: UUID)
 }
 
@@ -34,7 +33,7 @@ struct DisabledBlockingClient: BlockingClient {
     func activeSessions() throws -> [String: UUID] { [:] }
     func pendingRequest() throws -> BlockingRequest? { nil }
     func cancelRequest(_ id: UUID?) {}
-    func beginSession(service: Service, requestID: UUID, sessionID: UUID, minutes: Int, reason: String, isSnooze: Bool) throws {
+    func beginSession(service: Service, requestID: UUID, sessionID: UUID, minutes: Int, reason: String) throws {
         throw Unavailable()
     }
     func endSession(_ id: UUID) {}

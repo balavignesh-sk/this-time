@@ -7,7 +7,7 @@ struct ServiceSection: View {
     var body: some View {
         ServiceGroup(
             services: store.services.filter {
-                ($0.webDomainTokenData != nil || !$0.domain.isEmpty) == showingWebsites
+                ($0.webDomainTokenData != nil) == showingWebsites
             },
             store: store
         )
