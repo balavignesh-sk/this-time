@@ -8,6 +8,7 @@ final class IntentionStore {
     private(set) var services: [Service]
     private(set) var intention: IntentionPreferences
     private(set) var blockingEnabled: Bool
+    private(set) var protectionNeedsAuthorization = false
     private(set) var activeSessions: [String: UUID] = [:]
     var unlockedService: Service?
     var notice: String?
@@ -113,6 +114,7 @@ final class IntentionStore {
     func disableBlocking() {
         blocking.clear()
         blockingEnabled = false
+        protectionNeedsAuthorization = false
         preferences.blockingEnabled = false
         activeSessions = [:]
         pendingPresentation = nil
@@ -120,8 +122,13 @@ final class IntentionStore {
     }
 
     func refreshBlocking() {
+        protectionNeedsAuthorization = blockingEnabled && !blocking.isAuthorized
         guard blocking.isAuthorized else {
-            if blockingEnabled { disableBlocking() }
+            // Preserve the user's preference and the shared grants on a failed status read.
+            // iOS controls enforcement while permission is unavailable.
+            activeSessions = [:]
+            pendingPresentation = nil
+            unlockedService = nil
             return
         }
         do {

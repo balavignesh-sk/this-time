@@ -57,13 +57,6 @@
         },
       ],
     }, {
-      "path": "ScreenTimeShared.swift",
-      "target-membership": [
-        "this time/compile-sources",
-        "IntentionShieldAction/compile-sources",
-        "IntentionActivityMonitor/compile-sources",
-      ],
-    }, {
       "kind": "folder",
       "path": "IntentionLiveActivity",
       "target-membership": [
@@ -98,12 +91,33 @@
     { "kind": "folder", "path": "SessionExpiry" },
     { "path": "Architecture.md" },
     {
-      "path": "IntentionActivityAttributes.swift",
-      "target-membership": [
-        "this time/compile-sources",
-        "IntentionShieldAction/compile-sources",
-        "IntentionActivityMonitor/compile-sources",
-        "IntentionLiveActivityExtension/compile-sources",
+      "kind": "group",
+      "path": "Shared",
+      "children": [
+        {
+          "path": "ScreenTimeShared.swift",
+          "target-membership": [
+            "this time/compile-sources",
+            "IntentionShieldAction/compile-sources",
+            "IntentionActivityMonitor/compile-sources",
+          ],
+        }, {
+          "path": "IntentionActivityAttributes.swift",
+          "target-membership": [
+            "this time/compile-sources",
+            "IntentionShieldAction/compile-sources",
+            "IntentionActivityMonitor/compile-sources",
+            "IntentionLiveActivityExtension/compile-sources",
+          ],
+        }, {
+          "path": "README.md",
+          "target-membership": [
+            "this time/resources",
+            "IntentionShieldAction/resources",
+            "IntentionActivityMonitor/resources",
+            "IntentionLiveActivityExtension/resources",
+          ],
+        },
       ],
     },
   ],

@@ -2,23 +2,36 @@ import SwiftUI
 
 struct ServiceSection: View {
     let store: IntentionStore
-    let add: () -> Void
+    let showingWebsites: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Eyebrow(title: "LOCKED ITEMS")
-            if store.services.isEmpty {
-                Text("Choose apps, categories, or websites to pause before opening.")
+        ServiceGroup(
+            services: store.services.filter {
+                ($0.webDomainTokenData != nil || !$0.domain.isEmpty) == showingWebsites
+            },
+            store: store
+        )
+    }
+}
+
+private struct ServiceGroup: View {
+    let services: [Service]
+    let store: IntentionStore
+
+    var body: some View {
+        Section {
+            if services.isEmpty {
+                Text("No items added")
                     .foregroundStyle(Paper.muted)
             }
-            ForEach(store.services) { service in
+            ForEach(services) { service in
                 LockedServiceRow(service: service, store: store)
+                    .swipeActions {
+                        Button("Remove", role: .destructive) { store.remove(service) }
+                    }
             }
-            Button(action: add) {
-                Label("Choose items to lock", systemImage: "plus")
-            }
-            .disabled(!store.isBlockingAvailable)
         }
+        .listRowBackground(Paper.background)
     }
 }
 
@@ -27,25 +40,26 @@ private struct LockedServiceRow: View {
     let store: IntentionStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ServiceLabel(service: service)
-            HStack {
-                Text(store.activeSessions[service.id] != nil ? "Unlocked" : store.blockingEnabled ? "Locked" : "Protection off")
-                    .font(.caption).foregroundStyle(Paper.muted)
-                Spacer()
-                if store.activeSessions[service.id] != nil {
-                    Button("Lock now") { store.relock(service) }
-                } else {
-                    Button("Unlock") { store.requestUnlock(service) }
-                        .disabled(!store.blockingEnabled)
-                }
-                Button("Remove item", systemImage: "minus.circle", role: .destructive) {
-                    store.remove(service)
-                }
-                .labelStyle(.iconOnly)
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 5) {
+                ServiceLabel(service: service)
+                Text(store.protectionNeedsAuthorization ? "Access needed" : store.activeSessions[service.id] != nil ? "Unlocked" : store.blockingEnabled ? "Locked" : "Protection off")
+                    .font(.caption)
+                    .foregroundStyle(Paper.muted)
             }
-            Divider()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            if store.activeSessions[service.id] != nil {
+                Button("Lock", systemImage: "lock") { store.relock(service) }
+                    .buttonStyle(.borderless)
+            } else {
+                Button("Unlock", systemImage: "lock.open") { store.requestUnlock(service) }
+                    .buttonStyle(.borderless)
+                    .disabled(!store.blockingEnabled || store.protectionNeedsAuthorization)
+            }
         }
         .padding(.vertical, 6)
+        .contextMenu {
+            Button("Remove", systemImage: "trash", role: .destructive) { store.remove(service) }
+        }
     }
 }

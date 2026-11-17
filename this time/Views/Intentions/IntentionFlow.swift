@@ -13,9 +13,7 @@ struct IntentionFlow: View {
     init(presentation: IntentionStore.Presentation, store: IntentionStore) {
         self.presentation = presentation
         self.store = store
-        _minutes = State(initialValue: min(max(store.intention.unlockMinutes,
-                                              SessionPolicy.minimumMinutes),
-                                          SessionPolicy.maximumMinutes))
+        _minutes = State(initialValue: 15)
     }
 
     private var validAnswer: Bool {

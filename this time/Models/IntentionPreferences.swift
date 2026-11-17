@@ -7,7 +7,7 @@ struct AlternativeActivity: Codable, Identifiable, Equatable {
 
 struct IntentionPreferences: Codable {
     var onboardingComplete = false
-    var unlockMinutes = 5
+    var unlockMinutes = 15
     var alternatives: [AlternativeActivity] = []
 }
 

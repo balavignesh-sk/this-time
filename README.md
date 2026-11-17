@@ -43,7 +43,7 @@ See [Family Controls setup](FamilyControlsSetup.md) for signing, entitlements, a
 | `this time/Models/` | Services, preferences, prompts, session policy, and history |
 | `this time/Services/` | Blocking, persistence, notifications, and dependency configuration |
 | `this time/Helpers/BlockingLifecycle.swift` | Reconciliation when the app becomes active or handles notifications |
-| `ScreenTimeShared.swift` | Shared requests, selections, and access grants across processes |
+| [`Shared/`](Shared/README.md) | Cross-target Screen Time state and Live Activity attributes; includes target membership notes |
 | `IntentionShieldConfiguration/` | Screen Time shield appearance |
 | `IntentionShieldAction/` | Shield button actions and unlock requests |
 | `IntentionActivityMonitor/` | Background usage and timing callbacks that restore protection |

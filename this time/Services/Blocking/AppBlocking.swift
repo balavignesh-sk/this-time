@@ -7,7 +7,12 @@ import DeviceActivity
 @MainActor
 final class AppBlocking: BlockingClient {
     var isAvailable: Bool { true }
-    var isAuthorized: Bool { AuthorizationCenter.shared.authorizationStatus == .approved }
+    var isAuthorized: Bool {
+        switch AuthorizationCenter.shared.authorizationStatus {
+        case .approved, .approvedWithDataAccess: true
+        default: false
+        }
+    }
     private let center = DeviceActivityCenter()
 
     func authorize() async throws {
@@ -16,8 +21,10 @@ final class AppBlocking: BlockingClient {
     }
 
     func apply(services: [Service], enabled: Bool) throws {
+        // An authorization failure is not a request to turn protection off.
+        guard !enabled || isAuthorized else { throw BlockingError.notAuthorized }
         try ScreenTimeShared.update { state in
-            state.enabled = enabled && isAuthorized
+            state.enabled = enabled
             state.items = services.map {
                 ScreenTimeShared.Item(id: $0.id, application: $0.applicationTokenData,
                                       website: $0.webDomainTokenData, category: $0.categoryTokenData)

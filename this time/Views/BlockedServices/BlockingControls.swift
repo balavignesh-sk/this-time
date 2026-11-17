@@ -8,14 +8,14 @@ struct BlockingControls: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: store.blockingEnabled ? "lock.shield" : "lock.open")
-                Text(store.blockingEnabled ? "Protection is on" : "Protection is off")
+                Text(store.protectionNeedsAuthorization ? "Screen Time access needed" : store.blockingEnabled ? "Protection is on" : "Protection is off")
                 Spacer()
             }
             if !store.isBlockingAvailable {
                 Text("Screen Time blocking is unavailable in this build.")
                     .font(.footnote).foregroundStyle(Paper.muted)
-            } else if !store.blockingEnabled {
-                Button(enabling ? "Enabling…" : "Enable protection") {
+            } else if !store.blockingEnabled || store.protectionNeedsAuthorization {
+                Button(enabling ? "Connecting…" : store.protectionNeedsAuthorization ? "Restore access" : "Enable protection") {
                     enabling = true
                     Task {
                         await store.enableBlocking()
@@ -24,8 +24,6 @@ struct BlockingControls: View {
                 }
                 .buttonStyle(InkButton()).disabled(enabling)
             }
-            Text("Without notifications, open Rules and tap Unlock beside an item.")
-                .font(.footnote).foregroundStyle(Paper.muted)
         }
     }
 }
