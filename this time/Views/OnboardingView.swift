@@ -9,7 +9,6 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 PromiseBoy().frame(width: 120, height: 152).accessibilityHidden(true)
-                Eyebrow(title: "THIS TIME")
                 Text(step == 0 ? "One question first." : step == 1 ? "Choose what gets blocked." : "Notifications, if you want.")
                     .font(.largeTitle)
                 Text(step == 0

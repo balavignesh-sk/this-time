@@ -38,8 +38,16 @@ struct AddServiceView: View {
                     .padding(24)
                 #endif
             }
+            #if os(iOS)
+            .background(Color(uiColor: .systemGroupedBackground))
+            #else
             .background(Paper.background)
-            .navigationTitle("Add app or website")
+            #endif
+            .navigationTitle("Apps & websites")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color(uiColor: .systemGroupedBackground), for: .navigationBar)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -64,6 +72,9 @@ struct AddServiceView: View {
             .task { await requestAccess() }
             #endif
         }
+        #if os(iOS)
+        .presentationBackground(Color(uiColor: .systemGroupedBackground))
+        #endif
         .tint(Paper.ink)
     }
 

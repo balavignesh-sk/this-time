@@ -4,13 +4,8 @@ import UIKit
 
 final class IntentionShieldConfiguration: ShieldConfigurationDataSource {
     private func shield() -> ShieldConfiguration {
-        let ink = UIColor(red: 0.18, green: 0.21, blue: 0.18, alpha: 1)
-        // Shields inherit the blocked app's appearance, not our SwiftUI color scheme.
-        let paper = UIColor { traits in
-            traits.userInterfaceStyle == .dark
-                ? UIColor(red: 0.12, green: 0.14, blue: 0.12, alpha: 1)
-                : UIColor(red: 0.97, green: 0.96, blue: 0.93, alpha: 1)
-        }
+        let ink = UIColor.darkGray
+        let paper = UIColor.systemBackground
         let icon = UIImage(systemName: "pause.circle",
                            withConfiguration: UIImage.SymbolConfiguration(pointSize: 48, weight: .regular))?
             .withTintColor(UIColor.systemOrange, renderingMode: .alwaysOriginal)

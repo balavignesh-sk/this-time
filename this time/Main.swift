@@ -2,7 +2,7 @@ import SwiftUI
 import UserNotifications
 
 @main
-struct MyApp: App {
+struct Main: App {
     init() {
         UNUserNotificationCenter.current().delegate = IntentionNotificationDelegate.shared
     }

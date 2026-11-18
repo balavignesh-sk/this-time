@@ -28,3 +28,17 @@ struct ServiceLabel: View {
     }
 }
 
+struct ServiceRowLabelStyle: LabelStyle {
+    @ScaledMetric(relativeTo: .subheadline) private var iconSize = 24
+
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 10) {
+            configuration.icon
+                .frame(width: iconSize, height: iconSize)
+            configuration.title
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+

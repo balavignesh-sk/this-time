@@ -88,7 +88,6 @@
         { "path": "<PRODUCTS>/IntentionLiveActivityExtension.appex", "id": "2FAD4A4F30AB2F1E00F4AC70", "type": "wrapper.app-extension", "index": false, "target-membership": [ { "build-phase": "this time/copy/Embed App Extensions", "header-preservation": "remove-on-copy" } ] },
       ],
     },
-    { "kind": "folder", "path": "SessionExpiry" },
     { "path": "Architecture.md" },
     {
       "kind": "group",

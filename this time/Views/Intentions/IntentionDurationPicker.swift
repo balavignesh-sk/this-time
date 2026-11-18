@@ -28,7 +28,6 @@ struct IntentionDurationPicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Eyebrow(title: "HOW LONG?")
             HStack(spacing: 12) {
                 VStack(spacing: 0) {
                     Text("Hours").font(.caption).foregroundStyle(Paper.muted)

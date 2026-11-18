@@ -6,7 +6,7 @@ struct BlockedServicesView: View {
     @State private var showingWebsites = false
 
     var body: some View {
-        VStack(spacing: 0) {
+        List {
             HStack(spacing: 8) {
                 RulesFilterPill(title: "Apps", isSelected: !showingWebsites) {
                     showingWebsites = false
@@ -16,19 +16,19 @@ struct BlockedServicesView: View {
                 }
                 Spacer(minLength: 0)
             }
-            .padding(.horizontal, 20)
             .padding(.vertical, 8)
+            .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+            .listRowSeparator(.hidden)
+            .listRowBackground(Paper.background)
 
-            List {
-                if !store.blockingEnabled || !store.isBlockingAvailable || store.protectionNeedsAuthorization {
-                    Section { BlockingControls(store: store) }
-                        .listRowBackground(Paper.background)
-                }
-                ServiceSection(store: store, showingWebsites: showingWebsites)
+            if !store.blockingEnabled || !store.isBlockingAvailable || store.protectionNeedsAuthorization {
+                Section { BlockingControls(store: store) }
+                    .listRowBackground(Paper.background)
             }
-            .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
+            ServiceSection(store: store, showingWebsites: showingWebsites)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .background(Paper.background)
         .navigationTitle("Rules")
         .toolbar {
@@ -76,7 +76,6 @@ struct AlternativesSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Eyebrow(title: "OTHER OPTIONS")
             Text("Anything else on the list?").font(.headline)
             Text("Optional. These may come up when we ask why you’re opening an app.")
                 .font(.footnote).foregroundStyle(Paper.muted)

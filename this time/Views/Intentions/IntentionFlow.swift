@@ -33,7 +33,6 @@ struct IntentionFlow: View {
                             .foregroundStyle(Paper.muted)
                         Button("Done") { dismiss() }.buttonStyle(InkButton())
                     } else if confirming {
-                        Eyebrow(title: "YOUR ANSWER")
                         Text("Still want to open it?").font(.largeTitle)
                         Text(answer.trimmingCharacters(in: .whitespacesAndNewlines))
                             .font(.title3)
@@ -51,7 +50,6 @@ struct IntentionFlow: View {
                         Button("No, leave it locked") { decide(unlock: false) }
                             .disabled(saving)
                     } else {
-                        Eyebrow(title: "THIS TIME")
                         Text(presentation.prompt.text).font(.title2)
                         TextField("Write your reason", text: $answer, axis: .vertical)
                             .lineLimit(3...8)
