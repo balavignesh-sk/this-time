@@ -2,15 +2,22 @@ import ActivityKit
 import SwiftUI
 import WidgetKit
 
+private enum ActivityColors {
+    static let background = Color(uiColor: .systemBackground)
+    static let text = Color(uiColor: .label)
+    static let accent = Color.orange
+    static let track = Color(uiColor: .tertiaryLabel)
+}
+
 struct IntentionLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: IntentionActivityAttributes.self) { context in
             IntentionActivityCard(context: context)
                 .padding()
-                .foregroundStyle(.white)
-                .background(Color(red: 0.10, green: 0.12, blue: 0.11))
-                .activityBackgroundTint(Color(red: 0.10, green: 0.12, blue: 0.11))
-                .activitySystemActionForegroundColor(.white)
+                .foregroundStyle(ActivityColors.text)
+                .background(ActivityColors.background)
+                .activityBackgroundTint(ActivityColors.background)
+                .activitySystemActionForegroundColor(ActivityColors.text)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.bottom) {
@@ -80,7 +87,7 @@ private struct IntentionOpeningText: View {
 /// A full ring means the whole budget remains. Usage rings move only on confirmed reports.
 private struct RemainingTimeRing: View {
     let context: ActivityViewContext<IntentionActivityAttributes>
-    private let accent = Color(red: 0.92, green: 0.44, blue: 0.22)
+    private let accent = ActivityColors.accent
 
     var body: some View {
         ZStack {
@@ -97,7 +104,7 @@ private struct RemainingTimeRing: View {
                 .tint(accent)
             } else {
                 Circle()
-                    .stroke(accent.opacity(0.2), lineWidth: 3)
+                    .stroke(ActivityColors.track, lineWidth: 3)
                 Circle()
                     .trim(from: 0, to: context.state.ended ? 0 :
                         CGFloat(context.attributes.remainingMinutes(for: context.state)) /

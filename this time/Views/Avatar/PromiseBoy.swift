@@ -17,7 +17,7 @@ struct PromiseBoy: View {
                              control1: CGPoint(x: 125, y: 107), control2: CGPoint(x: 117, y: 128))
             outline.addCurve(to: CGPoint(x: 42, y: 135),
                              control1: CGPoint(x: 91, y: 148), control2: CGPoint(x: 59, y: 145))
-            context.stroke(outline.applying(transform), with: .color(Paper.ink),
+            context.stroke(outline.applying(transform), with: .color(AppColors.textPrimary),
                            style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
 
             var details = Path()
@@ -35,11 +35,11 @@ struct PromiseBoy: View {
             // A small, quiet smile.
             details.move(to: CGPoint(x: 67, y: 96))
             details.addQuadCurve(to: CGPoint(x: 82, y: 95), control: CGPoint(x: 75, y: 102))
-            context.stroke(details.applying(transform), with: .color(Paper.ink),
+            context.stroke(details.applying(transform), with: .color(AppColors.textPrimary),
                            style: StrokeStyle(lineWidth: 1.7, lineCap: .round, lineJoin: .round))
             for eye in [CGRect(x: 58, y: 79, width: 3, height: 4),
                         CGRect(x: 87, y: 78, width: 3, height: 4)] {
-                context.fill(Path(ellipseIn: eye).applying(transform), with: .color(Paper.ink))
+                context.fill(Path(ellipseIn: eye).applying(transform), with: .color(AppColors.textPrimary))
             }
         }
     }

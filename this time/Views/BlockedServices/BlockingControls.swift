@@ -13,7 +13,7 @@ struct BlockingControls: View {
             }
             if !store.isBlockingAvailable {
                 Text("Screen Time blocking is unavailable in this build.")
-                    .font(.footnote).foregroundStyle(Paper.muted)
+                    .font(.footnote).foregroundStyle(AppColors.textSecondary)
             } else if !store.blockingEnabled || store.protectionNeedsAuthorization {
                 Button(enabling ? "Connecting…" : store.protectionNeedsAuthorization ? "Restore access" : "Enable protection") {
                     enabling = true

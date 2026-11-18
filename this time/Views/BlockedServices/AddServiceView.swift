@@ -39,14 +39,14 @@ struct AddServiceView: View {
                 #endif
             }
             #if os(iOS)
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background(AppColors.groupedBackground)
             #else
-            .background(Paper.background)
+            .background(AppColors.background)
             #endif
             .navigationTitle("Apps & websites")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color(uiColor: .systemGroupedBackground), for: .navigationBar)
+            .toolbarBackground(AppColors.groupedBackground, for: .navigationBar)
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -73,9 +73,9 @@ struct AddServiceView: View {
             #endif
         }
         #if os(iOS)
-        .presentationBackground(Color(uiColor: .systemGroupedBackground))
+        .presentationBackground(AppColors.groupedBackground)
         #endif
-        .tint(Paper.ink)
+        .tint(AppColors.accent)
     }
 
     #if os(iOS) && FAMILY_CONTROLS

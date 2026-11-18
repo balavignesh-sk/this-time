@@ -10,25 +10,25 @@ struct HistoryView: View {
             Section {
                 if entries.isEmpty {
                     Text("Your intentions will appear here.")
-                        .foregroundStyle(Paper.muted)
-                        .listRowBackground(Paper.background)
+                        .foregroundStyle(AppColors.textSecondary)
+                        .listRowBackground(AppColors.background)
                 }
                 ForEach(sortedEntries) { entry in
                     IntentionEntryRow(entry: entry)
                         .listRowInsets(EdgeInsets(top: 24, leading: 20, bottom: 24, trailing: 20))
                         .listRowSeparator(entry.id == sortedEntries.first?.id ? .hidden : .visible, edges: .top)
                         .listRowSeparator(entry.id == sortedEntries.last?.id ? .hidden : .visible, edges: .bottom)
-                        .listRowSeparatorTint(Paper.ink.opacity(0.07))
+                        .listRowSeparatorTint(AppColors.separator)
                         .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                         .alignmentGuide(.listRowSeparatorTrailing) { dimensions in dimensions.width }
-                        .listRowBackground(Paper.background)
+                        .listRowBackground(AppColors.background)
                 }
             }
             .listSectionSeparator(.hidden)
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .background(Paper.background)
+        .background(AppColors.background)
         .navigationTitle("History")
     }
 }
@@ -56,7 +56,7 @@ private struct IntentionEntryRow: View {
                 }
             }
             .font(.caption)
-            .foregroundStyle(Paper.muted)
+            .foregroundStyle(AppColors.textSecondary)
         }
         .fontDesign(.default)
         .frame(maxWidth: .infinity, alignment: .leading)

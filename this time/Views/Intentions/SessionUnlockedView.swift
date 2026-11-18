@@ -20,7 +20,7 @@ struct SessionUnlockedView: View {
                         .font(.body)
                     Text("If the button isn’t visible, return using the app switcher.")
                         .font(.footnote)
-                        .foregroundStyle(Paper.muted)
+                        .foregroundStyle(AppColors.textSecondary)
                 }
                 .frame(maxWidth: 540, alignment: .leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -33,6 +33,6 @@ struct SessionUnlockedView: View {
         .padding(.top, 8)
         .padding(.bottom, 24)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(Paper.background.ignoresSafeArea())
+        .background(AppColors.background.ignoresSafeArea())
     }
 }

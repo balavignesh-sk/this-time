@@ -11,7 +11,7 @@ struct MainTabs: View {
                     .frame(width: 180, height: 240)
                     .accessibilityLabel("Promise Boy")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Paper.background)
+                    .background(AppColors.background)
             }
             Tab("Rules", systemImage: "lock") {
                 NavigationStack { BlockedServicesView(store: store) }

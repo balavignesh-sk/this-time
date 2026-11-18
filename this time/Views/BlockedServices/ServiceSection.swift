@@ -22,14 +22,14 @@ private struct ServiceGroup: View {
         Section {
             if services.isEmpty {
                 Text("No items added")
-                    .foregroundStyle(Paper.muted)
+                    .foregroundStyle(AppColors.textSecondary)
             }
             ForEach(services) { service in
                 LockedServiceRow(service: service, store: store)
                     .listRowInsets(EdgeInsets(top: 24, leading: 20, bottom: 24, trailing: 20))
                     .listRowSeparator(service.id == services.first?.id ? .hidden : .visible, edges: .top)
                     .listRowSeparator(service.id == services.last?.id ? .hidden : .visible, edges: .bottom)
-                    .listRowSeparatorTint(Paper.ink.opacity(0.07))
+                    .listRowSeparatorTint(AppColors.separator)
                     .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                     .alignmentGuide(.listRowSeparatorTrailing) { dimensions in dimensions.width }
                     .swipeActions {
@@ -38,7 +38,7 @@ private struct ServiceGroup: View {
             }
         }
         .listSectionSeparator(.hidden)
-        .listRowBackground(Paper.background)
+        .listRowBackground(AppColors.background)
     }
 }
 

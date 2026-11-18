@@ -25,10 +25,9 @@ struct ContentView: View {
         }
         .font(.system(.body, design: .monospaced))
         .fontDesign(.monospaced)
-        .background(Paper.background.ignoresSafeArea())
-        .foregroundStyle(Paper.ink)
-        .tint(Paper.ink)
-        .preferredColorScheme(.light)
+        .background(AppColors.background.ignoresSafeArea())
+        .foregroundStyle(AppColors.textPrimary)
+        .tint(AppColors.accent)
         .sheet(item: Binding(
             get: { store.intention.onboardingComplete ? store.pendingPresentation : nil },
             set: { _ in }

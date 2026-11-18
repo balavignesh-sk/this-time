@@ -16,7 +16,7 @@ struct OnboardingView: View {
                      : step == 1
                      ? "Screen Time lets this time shield the apps, categories, and websites you choose. Your selections and answers stay on this device."
                      : "Tap a notification to answer the question and unlock. You can also do this from Rules. Notifications are optional.")
-                    .foregroundStyle(Paper.muted)
+                    .foregroundStyle(AppColors.textSecondary)
                 if step == 0 {
                     Button("Get started") { step = 1 }.buttonStyle(InkButton())
                 } else if step == 1 {
@@ -42,12 +42,12 @@ struct OnboardingView: View {
                     .buttonStyle(InkButton()).disabled(busy)
                     Button("Continue without notifications") { store.finishOnboarding() }.disabled(busy)
                 }
-                Text("\(step + 1) / 3").font(.caption).foregroundStyle(Paper.muted)
+                Text("\(step + 1) / 3").font(.caption).foregroundStyle(AppColors.textSecondary)
             }
             .padding(28)
             .frame(maxWidth: 540)
             .frame(maxWidth: .infinity)
         }
-        .background(Paper.background)
+        .background(AppColors.background)
     }
 }

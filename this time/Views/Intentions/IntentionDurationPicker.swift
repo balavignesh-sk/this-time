@@ -30,7 +30,7 @@ struct IntentionDurationPicker: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
                 VStack(spacing: 0) {
-                    Text("Hours").font(.caption).foregroundStyle(Paper.muted)
+                    Text("Hours").font(.caption).foregroundStyle(AppColors.textSecondary)
                     Picker("Hours", selection: hours) {
                         ForEach(0...(SessionPolicy.maximumMinutes / 60), id: \.self) { hour in
                             Text(hour, format: .number).tag(hour)
@@ -40,7 +40,7 @@ struct IntentionDurationPicker: View {
                     .clipped()
                 }
                 VStack(spacing: 0) {
-                    Text("Minutes").font(.caption).foregroundStyle(Paper.muted)
+                    Text("Minutes").font(.caption).foregroundStyle(AppColors.textSecondary)
                     Picker("Minutes", selection: remainingMinutes) {
                         ForEach(minuteRange, id: \.self) { minute in
                             Text(minute, format: .number).tag(minute)

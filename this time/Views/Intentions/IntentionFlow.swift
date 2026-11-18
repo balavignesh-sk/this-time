@@ -25,25 +25,26 @@ struct IntentionFlow: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
                     ServiceLabel(service: presentation.service)
-                        .foregroundStyle(Paper.muted)
+                        .foregroundStyle(AppColors.textSecondary)
                     if steppedAway {
                         PromiseBoy().frame(width: 100, height: 130).accessibilityHidden(true)
                         Text("Not opening it, then.").font(.title)
                         Text("Answer saved. Still locked.")
-                            .foregroundStyle(Paper.muted)
+                            .foregroundStyle(AppColors.textSecondary)
                         Button("Done") { dismiss() }.buttonStyle(InkButton())
                     } else if confirming {
-                        Text("Still want to open it?").font(.largeTitle)
-                        Text(answer.trimmingCharacters(in: .whitespacesAndNewlines))
-                            .font(.title3)
-                            .padding(20)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Paper.ink.opacity(0.05))
+                        Text("So, you want to open it because \"\(answer.trimmingCharacters(in: .whitespacesAndNewlines))\".").font(.title3)
+//                        Text(answer.trimmingCharacters(in: .whitespacesAndNewlines))
+//                            .font(.title3)
+//                            .padding(20)
+//                            .frame(maxWidth: .infinity, alignment: .leading)
+//                            .background(AppColors.controlFill)
+                        Text("How long do you want to use it for?").font(.title)
                         IntentionDurationPicker(minutes: $minutes)
                         Text(presentation.service.webDomainTokenData != nil
                              ? "Continuing unlocks all selected websites for \(minutes) minutes."
                              : "Continuing allows \(minutes) minutes of active use.")
-                            .foregroundStyle(Paper.muted)
+                            .foregroundStyle(AppColors.textSecondary)
                         Button("Yes, unlock") { decide(unlock: true) }
                             .buttonStyle(InkButton())
                             .disabled(saving || !SessionPolicy.allowedMinutes.contains(minutes))
@@ -56,7 +57,7 @@ struct IntentionFlow: View {
                             .padding(.vertical, 16)
                             .overlay(alignment: .bottom) { Divider() }
                         Text("Write at least \(SessionPolicy.minimumAnswerLength) characters.")
-                            .font(.caption).foregroundStyle(Paper.muted)
+                            .font(.caption).foregroundStyle(AppColors.textSecondary)
                         Button("Continue") { confirming = true }
                             .buttonStyle(InkButton()).disabled(!validAnswer)
                     }
@@ -65,7 +66,7 @@ struct IntentionFlow: View {
                 .frame(maxWidth: 540)
                 .frame(maxWidth: .infinity)
             }
-            .background(Paper.background)
+            .background(AppColors.background)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(confirming && !steppedAway ? "Back" : "Close") {
@@ -74,7 +75,7 @@ struct IntentionFlow: View {
                 }
             }
         }
-        .tint(Paper.ink)
+        .tint(AppColors.accent)
         .interactiveDismissDisabled(saving)
         .alert("Couldn’t save your answer", isPresented: Binding(
             get: { store.notice != nil },

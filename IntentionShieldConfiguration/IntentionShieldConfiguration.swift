@@ -2,9 +2,15 @@ import ManagedSettings
 import ManagedSettingsUI
 import UIKit
 
+private enum ShieldColors {
+    // Keep the filled button's contrast independent of the host app's appearance.
+    static let primaryButtonBackground = UIColor.darkGray
+    static let primaryButtonText = UIColor.white
+    static let secondaryButtonText = UIColor.label
+}
+
 final class IntentionShieldConfiguration: ShieldConfigurationDataSource {
     private func shield() -> ShieldConfiguration {
-        let ink = UIColor.darkGray
         let paper = UIColor.systemBackground
         let icon = UIImage(systemName: "pause.circle",
                            withConfiguration: UIImage.SymbolConfiguration(pointSize: 48, weight: .regular))?
@@ -14,10 +20,10 @@ final class IntentionShieldConfiguration: ShieldConfigurationDataSource {
             backgroundColor: paper,
             icon: icon,
             title: .init(text: String(localized: "Why do you want to use it this time?"), color: .label),
-            subtitle: .init(text: String(localized: "Tap “Tell me why”, then open the notification.\n\nNo notification? Open this time → Rules → Unlock."), color: .secondaryLabel),
-            primaryButtonLabel: .init(text: String(localized: "Not now"), color: .white),
-            primaryButtonBackgroundColor: ink,
-            secondaryButtonLabel: .init(text: String(localized: "Tell me why"), color: .label)
+            subtitle: .init(text: String(localized: "Tap “Set intention”, then open the notification.\n\nNo notification? Open this time → Rules → Unlock."), color: .secondaryLabel),
+            primaryButtonLabel: .init(text: String(localized: "Not now"), color: ShieldColors.primaryButtonText),
+            primaryButtonBackgroundColor: ShieldColors.primaryButtonBackground,
+            secondaryButtonLabel: .init(text: String(localized: "Set intention"), color: ShieldColors.secondaryButtonText)
         )
     }
 

@@ -24,8 +24,8 @@ final class IntentionShieldAction: ShieldActionDelegate {
         do {
             try ScreenTimeShared.request(application: application, website: website, category: category)
             let content = UNMutableNotificationContent()
-            content.title = String(localized: "Why do you want to use it?")
-            content.body = String(localized: "Tap to answer, then decide whether to open it.")
+            content.title = String(localized: "Set intention")
+            content.body = String(localized: "Tap to set your intention for the action, then decide whether to go through with it.")
             content.sound = .default
             content.userInfo = ["route": "setAppOpenIntention"]
             let request = UNNotificationRequest(identifier: "thisTime.setAppOpenIntention", content: content,

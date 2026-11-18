@@ -36,7 +36,7 @@ struct SettingsView: View {
                         Section { AlternativesSection(store: store) }
                     }
                     .scrollContentBackground(.hidden)
-                    .background(Paper.background)
+                    .background(AppColors.background)
                     .navigationTitle("Alternatives")
                 }
             }
@@ -46,7 +46,7 @@ struct SettingsView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .background(Paper.background)
+        .background(AppColors.background)
         .navigationTitle("Settings")
         .confirmationDialog("Clear history?", isPresented: $confirmClear, titleVisibility: .visible) {
             Button("Clear history", role: .destructive) { store.clearHistory() }
@@ -83,7 +83,7 @@ private struct NotificationSettingsView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .background(Paper.background)
+        .background(AppColors.background)
         .navigationTitle("Notifications")
     }
 }

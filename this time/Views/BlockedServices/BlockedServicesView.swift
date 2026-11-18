@@ -19,17 +19,17 @@ struct BlockedServicesView: View {
             .padding(.vertical, 8)
             .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
             .listRowSeparator(.hidden)
-            .listRowBackground(Paper.background)
+            .listRowBackground(AppColors.background)
 
             if !store.blockingEnabled || !store.isBlockingAvailable || store.protectionNeedsAuthorization {
                 Section { BlockingControls(store: store) }
-                    .listRowBackground(Paper.background)
+                    .listRowBackground(AppColors.background)
             }
             ServiceSection(store: store, showingWebsites: showingWebsites)
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .background(Paper.background)
+        .background(AppColors.background)
         .navigationTitle("Rules")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -61,8 +61,8 @@ private struct RulesFilterPill: View {
                 .font(.subheadline.weight(.medium))
                 .padding(.horizontal, 20)
                 .frame(minHeight: 44)
-                .foregroundStyle(isSelected ? Paper.background : Paper.ink)
-                .background(isSelected ? Paper.ink : Paper.ink.opacity(0.06), in: Capsule())
+                .foregroundStyle(isSelected ? AppColors.selectedControlForeground : AppColors.textPrimary)
+                .background(isSelected ? AppColors.selectedControlBackground : AppColors.controlFill, in: Capsule())
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -78,7 +78,7 @@ struct AlternativesSection: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Anything else on the list?").font(.headline)
             Text("Optional. These may come up when we ask why you’re opening an app.")
-                .font(.footnote).foregroundStyle(Paper.muted)
+                .font(.footnote).foregroundStyle(AppColors.textSecondary)
             ForEach(store.intention.alternatives) { activity in
                 AlternativeRow(activity: activity, store: store)
             }

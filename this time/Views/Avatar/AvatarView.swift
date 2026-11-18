@@ -29,6 +29,6 @@ struct AvatarView: View {
         .accessibilityLabel(Text(configuration.accessibilityLabel))
         .accessibilityAddTraits(.isImage)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Paper.background)
+        .background(AppColors.background)
     }
 }
